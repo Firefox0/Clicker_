@@ -351,6 +351,6 @@ MigrationBackup/
 /.vscode
 /CppProperties.json
 
-/*.sln
-/*.vcxproj
-/*.vcxproj.*
+*.sln
+*.vcxproj
+*.vcxproj.*
