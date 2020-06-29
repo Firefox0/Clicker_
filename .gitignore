@@ -3,5 +3,7 @@
 /.vscode
 /Backup
 /Clicker/.vs/Clicker/v16
-/Clicker/Clicker.vcxproj.user
-/Clicker/*.sln
+/Clicker/*.vcxproj.user
+/Clicker/Clicker.sln
+/Clicker/*.vcxproj
+/Clicker/*.vcxproj.filters
