@@ -107,6 +107,7 @@ void Clicker::log_mouse(int timeout) {
         hex_color = Clicker::get_hex_color(point.x, point.y);
         printf("(%i, %i): %s\n", point.x, point.y, hex_color);
     }
+    delete[] hex_color;
 }
 
 int Clicker::wait_for_pixel(int x, int y, const char* color, int timeout, int sleep_ms) {
