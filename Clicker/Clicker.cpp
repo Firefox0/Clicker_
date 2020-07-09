@@ -1,6 +1,5 @@
 #include "Clicker.h"
-
-using namespace std;
+#include <vector>
 
 const int Clicker::large_buffer = 5000;
 const int Clicker::string_buffer = 200;
@@ -14,20 +13,18 @@ POINT Clicker::get_cursor_pos() {
 
 POINT Clicker::scan_area(int x_min, int x_max, int y_min, int y_max, const char* color, int debug) {
     POINT point = {};
-    char* hex_color = new char[Clicker::buffer];
+    std::string hex_color;
 
     for (int i = x_min; i <= x_max; i++) {
         for (int j = y_min; j <= y_max; j++) {
             hex_color = Clicker::get_hex_color(i, j);
-            if (strcmp(hex_color, color) == 0) {
-                delete[] hex_color;
+            if (hex_color.compare(color) == 0) {
                 point.x = i;
                 point.y = j;
                 return point;
             }
         }
     }
-    delete[] hex_color;
     return point;
 }
 
@@ -53,20 +50,21 @@ COLORREF Clicker::get_pixel_foreground(int x, int y) {
     return colorref;
 }
 
-char* Clicker::colorref_to_color(COLORREF colorref) {
-    char* hex_color = new char[Clicker::buffer];
-    sprintf_s(hex_color, sizeof(char) * Clicker::buffer, "0x%x%x%x", GetRValue(colorref), GetGValue(colorref), GetBValue(colorref));
-    return hex_color;
+std::string Clicker::colorref_to_color(COLORREF colorref) {
+    std::ostringstream oss;
+    oss << "0x" << GetRValue(colorref) << GetGValue(colorref) << GetBValue(colorref);
+    return oss.str();
 }
 
-char* Clicker::get_window_name() {
+std::string Clicker::get_window_name() {
     HWND hwnd = GetForegroundWindow();
-    char* window_name = new char[100];
-    GetWindowTextA(hwnd, window_name, 100);
+    char* temp_name = new char[100];
+    GetWindowTextA(hwnd, temp_name, 100);
+    std::string window_name(temp_name);
     return window_name;
 }
 
-char* Clicker::get_hex_color(int x, int y) {
+std::string Clicker::get_hex_color(int x, int y) {
     COLORREF colorref = Clicker::get_pixel_screen(x, y);
     return colorref_to_color(colorref);
 }
@@ -98,30 +96,30 @@ void Clicker::client_to_screen(POINT* point) {
     ClientToScreen(hwnd, point);
 }
 
-void Clicker::log_mouse(int timeout) {
+void Clicker::log_mouse(int timeout, int sleep_ms) {
     clock_t start = clock();
     POINT point;
-    char* hex_color = new char[8];
-    while (Clicker::check_timeout(start, timeout)) {
+    std::string hex_color;
+
+    while (Clicker::check_timeout(start, timeout) == 0) {
         point = Clicker::get_cursor_pos();
         hex_color = Clicker::get_hex_color(point.x, point.y);
-        printf("(%i, %i): %s\n", point.x, point.y, hex_color);
+        std::cout << "(" << point.x << ", " << point.y << "): " << hex_color << std::endl;
+        Sleep(sleep_ms);
     }
-    delete[] hex_color;
 }
 
 int Clicker::wait_for_pixel(int x, int y, const char* color, int timeout, int sleep_ms) {
     const clock_t start = clock();
-    char* hex_color = new char[Clicker::buffer];
+    std::string hex_color;
+
     while (true) {
         hex_color = get_hex_color(x, y);
-        if (strcmp(hex_color, color) == 0) {
-            delete[] hex_color;
+        if (hex_color.compare(color) == 0) {
             return 1;
         }
         if (timeout) {
             if (Clicker::check_timeout(start, timeout)) {
-                delete[] hex_color;
                 return 0;
             }
         }
@@ -164,27 +162,17 @@ RECT Clicker::get_window_rect_foreground() {
 void Clicker::log_area(int x_min, int x_max, int y_min, int y_max, const char* file_name) {
     COLORREF colorref;
     int buffer = (x_max - x_min) * (y_max - y_min);
-    char* hex_color = new char[Clicker::buffer];
-    char** logs = new char* [buffer];
-    for (int a = 0; a < buffer; a++) {
-        logs[a] = new char[Clicker::string_buffer];
-    }
-    int counter = 0;
+    std::string hex_color;
+    std::vector<std::string> logs;
+    std::ostringstream oss;
+
     for (int i = x_min; i < x_max; i++) {
         for (int j = y_min; j < y_max; j++) {
-            char* log = new char[Clicker::string_buffer];
             colorref = Clicker::get_pixel_screen(i, j);
             hex_color = Clicker::colorref_to_color(colorref);
-            sprintf_s(log, sizeof(char) * Clicker::string_buffer, "x: %i, y: %i, color: %s\n", i, j, hex_color);
-            strcpy_s(logs[counter], sizeof(char) * Clicker::string_buffer, log);
-            counter++;
-            delete[] log;
+            oss << "x: " << i << ", y: " << j << ", color: " << hex_color << std::endl;
+            logs.push_back(oss.str());
         }
     }
-    delete[] hex_color;
-    FileIO::write_2d_char_array(file_name, logs, buffer);
-    for (int a = 0; a < buffer; a++) {
-        delete[] logs[a];
-    }
-    delete[] logs;
+    FileIO::write_string_vector(file_name, logs, buffer);
 }

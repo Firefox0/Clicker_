@@ -8,6 +8,7 @@
 #include <ctime>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 class Clicker {
 
@@ -23,14 +24,14 @@ public:
     static COLORREF get_pixel_screen(int x, int y);
     static COLORREF get_pixel_foreground(int x, int y);
 
-    static char* colorref_to_color(COLORREF colorref);
-    static char* get_window_name();
-    static char* get_hex_color(int x, int y);
+    static std::string colorref_to_color(COLORREF colorref);
+    static std::string get_window_name();
+    static std::string get_hex_color(int x, int y);
 
     static void click_release_left();
     static void move_and_click(int x, int y, unsigned int restore = 1);
     static void client_to_screen(POINT* point);
-    static void log_mouse(int timeout);
+    static void log_mouse(int timeout, int sleep_ms = 1000);
 
     static int wait_for_pixel(int x, int y, const char* color, int timeout = 0, int sleep_ms = 1000);
     static int wait_and_click(int x, int y, const char* color, int timeout = 0, int sleep_ms = 1000);

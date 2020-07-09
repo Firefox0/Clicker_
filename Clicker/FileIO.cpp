@@ -1,14 +1,12 @@
 #include "FileIO.h"
 
-using namespace std;
-
 POINT FileIO::read_from_file(const char* file_name) {
     POINT point = {};
-    ifstream file(file_name);
+    std::ifstream file(file_name);
     if (!file.good()) {
         return point;
     }
-    string line;
+    std::string line;
     getline(file, line);
     point.x = (int)strtol(line.c_str(), nullptr, 10);
     getline(file, line);
@@ -25,8 +23,8 @@ void FileIO::write_pos(const char* file_name) {
     delete[] output;
 }
 
-void FileIO::write_2d_char_array(const char* file_name, char** array, int length) {
-    ofstream file(file_name);
+void FileIO::write_string_vector(const char* file_name, std::vector<std::string>&array, int length) {
+    std::ofstream file(file_name);
     for (int i = 0; i < length; i++) {
         file << array[i];
     }
@@ -34,7 +32,7 @@ void FileIO::write_2d_char_array(const char* file_name, char** array, int length
 }
 
 void FileIO::write_to_file(const char* file_name, char* output) {
-    ofstream file;
+    std::ofstream file;
     file.open(file_name);
     file << output;
     file.close();
