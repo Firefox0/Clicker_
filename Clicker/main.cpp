@@ -5,11 +5,11 @@
 int main() {
     const char* coords_txt = "coordinates.txt";
     bool read = FALSE;
-
+    Clicker clicker;
     POINT point = {};
     RECT rect = {};
-
     POINT window_size = {};
+
 
     while (true) {
         if (Clicker::get_window_name().find("Twitch") != -1) {
@@ -23,17 +23,12 @@ int main() {
                 window_size = Clicker::rect_to_point(rect);
                 point = Twitch::get_reward_pos(window_size);
                 Clicker::client_to_screen(&point);
-                point = Clicker::scan_area(point.x, point.x + 20, point.y, point.y + 10, Twitch::reward_color);
-                if (point.x != 0) {
-                    Clicker::move_and_click(point.x, point.y);
-                    Sleep(3000);
-                }
             }
-            /* fix this 
-            else {
+            point = Clicker::scan_area(point.x, point.x + 5, point.y, point.y + 5, Twitch::reward_color);
+            if (point.x != 0) {
                 Clicker::move_and_click(point.x, point.y);
+                Sleep(1000);
             }
-            */
             Sleep(1000);
         }
         Sleep(1000);

@@ -51,8 +51,11 @@ COLORREF Clicker::get_pixel_foreground(int x, int y) {
 }
 
 std::string Clicker::colorref_to_color(COLORREF colorref) {
+    int r = GetRValue(colorref);
+    int g = GetGValue(colorref);
+    int b = GetBValue(colorref);
     std::ostringstream oss;
-    oss << "0x" << GetRValue(colorref) << GetGValue(colorref) << GetBValue(colorref);
+    oss << "0x" << std::hex << r << std::hex << g << std::hex << b;
     return oss.str();
 }
 
